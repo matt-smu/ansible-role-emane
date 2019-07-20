@@ -1,0 +1,61 @@
+---
+# EMANE Ubuntu 18 setup
+# https://github.com/adjacentlink/emane/wiki/Build
+#
+
+- name: Install dependencie
+  become: yes
+  apt:
+    pkg:
+      - git
+      - gcc 
+      - g++ 
+      - autoconf 
+      - automake 
+      - libtool 
+      - libxml2-dev 
+      - libprotobuf-dev
+      - python-protobuf 
+      - libpcap-dev 
+      - libpcre3-dev 
+      - uuid-dev 
+      - debhelper 
+      - pkg-config
+      - python-setuptools 
+      - protobuf-compiler 
+      - dh-python 
+      - python3-protobuf 
+      - python3-setuptools
+      - python-lxml
+      - python3-lxml
+    state: present                                                                                                                                    
+    update_cache: yes                                                                                                                                 
+  tags: [package]
+
+- name: ensure emane install path exists
+  become: yes
+  file:
+    path: "{{emane_build_dir}}"
+    state: directory
+    owner: "{{ansible_user_id}}"
+  tags: [package]
+
+- name: clone EMANE
+  git:
+    repo: "{{ emane_repo_url }}"
+    dest: "{{ emane_build_dir }}"
+    version: "{{ emane_git_version }}"
+  creates: "{{emane_build_dir}}/bootstrap.sh"
+  tags: [package]
+
+- name: build EMANE
+  shell: ./autogen.sh && ./configure && make deb
+  args:
+    chdir: "{{emane_build_dir}}"
+    creates: "{{emane_build_dir}}/emane-{{emane_release_version}}.tar.gz"
+
+- name: install EMANE
+  become: yes
+  shell: dpkg -i *.deb && apt-get install -f
+  args:
+    chdir: "{{emane_build_dir}}/.debbuild"
