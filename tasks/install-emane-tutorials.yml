@@ -1,0 +1,120 @@
+---
+# https://github.com/adjacentlink/emane-tutorial/wiki
+#
+
+- name: ensure user owns /opt
+  file:
+    path: /opt
+    owner: "{{ansible_user_id}}"
+    group: "{{ansible_group_id}}"
+    state: directory
+    recurse: no
+
+- name: Install emane tutorial dependencies
+  become: yes
+  apt:
+    pkg:
+      - gpsd
+      - gpsd-clients
+      - olsrd
+      - iperf
+      - mgen
+      - rpm
+      - libzmq-dev
+      - sqlite3
+      - libsqlite3-dev
+      - python-zmq
+      - python3-zmq
+      - python-tk
+      - python3-tk
+      - python-pmw
+      - python-lxml
+      - python3-lxml
+      - lxc
+      - bridge-utils
+      - fping
+      - multitail
+      - openssh-server
+      - python-stdeb
+      - build-essential
+      - libcurl3
+      - python-pycurl
+      - python3-pycurl
+   tags: [emane-tut]
+
+- name: clone opentestpoint
+  git:
+    repo: "{{otp_repo_url}}"
+    dest: "{{otp_build_dir}}" 
+  tags: [emane-tut]
+  
+- name: build opentestpoint
+  shell: ./autogen.sh && ./configure && make && make deb
+  args:
+    chdir: "{{otp_build_dir}}"
+    creates: "{{otp_build_dir}}/otp.deb"
+  tags: [emane-tut]
+
+- name: install opentestpoint
+  become: yes
+  shell: dpkg -i *.deb && apt-get install -f
+  args:
+    chdir: "{{otp_build_dir}}/.debbuild"
+
+- name: clone opentestpoint emane probe
+  git:
+    repo: "{{otp_probe_emane_repo_url}}"
+    dest: "{{otp_probe_emane_build_dir}}"
+  tags: [emane-tut]
+  
+- name: build opentestpoint emane probe
+  shell: ./autogen.sh && ./configure && make && make deb
+  args:
+    chdir: "{{otp_probe_emane_build_dir}}"
+    creates: "{{otp_probe_emane_build_dir}}/otp_probe.deb"
+  tags: [emane-tut]
+
+- name: install opentestpoint emane probe
+  become: yes
+  shell: dpkg -i *.deb && apt-get install -f
+  args:
+    chdir: "{{otp_probe_emane_build_dir}}/.debbuild"
+
+- name: clone pynpdestatviz 
+  git:
+    repo: "{{pynodestatviz_repo_url}}"
+    dest: "{{pynodestatviz_build_dir}}"
+  tags: [emane-tut]
+
+- name: build pynodestatviz
+  become: no
+  shell: make deb 
+  args:
+    chdir: "{{pynodestatviz_build_dir}}"
+
+- name: install pynodestatviz
+  become: yes
+  shell: dpkg -i pynodestatviz*.deb && apt-get install -f
+  args:
+    chdir: "{{pynodestatviz_build_dir}}/deb_dist"
+
+- name: clone emane tutorial
+  git:
+    repo: "{{emane_tut_repo_url}}"
+    dest: "{{emane_tut_build_dir}}"
+  tags: [emane-tut]
+  
+- name: make emane tutorial
+  make:
+    chdir: "{{emane_tut_build_dir}}"
+
+- name: copy tutorial hosts file over TODO: dont clobber orig 
+  become: yes
+  copy: 
+  #src: "{{ansible_role_path}}/files/hosts"
+    src: hosts
+    dest: /etc/hosts
+    backup: yes
+
+
+

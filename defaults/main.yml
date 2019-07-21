@@ -1,8 +1,21 @@
 ---
 # defaults file for ansible-role-emane
+
 #
 emane_repo_url: https://github.com/adjacentlink/emane.git
 emane_build_dir: /opt/emane
 emane_git_version: master
 emane_release_version: 1.2.4
+
+# tutorial vars
+emane_install_tutorial: True
+emane_tut_repo_url: https://github.com/adjacentlink/emane-tutorial.git
+emane_tut_build_dir: /opt/emane-tutorial
+otp_repo_url: https://github.com/adjacentlink/opentestpoint.git
+otp_build_dir: /opt/otp
+otp_probe_emane_repor_url: https://github.com/adjacentlink/opentestpoint-probe-emane.git
+otp_probe_emane_build_dir: /opt/otp_probe
+pynodestatviz_repo_url: https://github.com/adjacentlink/pynodestatviz.git
+pynodestatviz_build_dir: /opt/pynodestatviz
+
 

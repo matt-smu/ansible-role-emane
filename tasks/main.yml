@@ -11,14 +11,17 @@
     - "{{ ansible_distribution }}.yml"
   tags: [package,vars]
 
-- include: setup-ubuntu14.yml                                                                                                                     
-  when: (ansible_os_family == 'Debian' or ansible_os_family == 'Ubuntu') and ansible_distribution_release == 'trusty'                                 
-  tags: package                                                                                                                                       
-                                                                                                                                                      
-- include: setup-ubuntu16.yml                                                                                                                     
-  when: (ansible_os_family == 'Debian' or ansible_os_family == 'Ubuntu') and ansible_distribution_release == 'xenial'                                 
-  tags: package                                                                                                                                       
-                                                                                                                                                      
-- include: setup-ubuntu18.yml                                                                                                                     
-  when: (ansible_os_family == 'Debian' or ansible_os_family == 'Ubuntu') and ansible_distribution_release == 'bionic'                                 
-  tags: package                                                                                          
+- include: setup-ubuntu14.yml
+  when: (ansible_os_family == 'Debian' or ansible_os_family == 'Ubuntu') and ansible_distribution_release == 'trusty'
+  tags: package
+
+- include: setup-ubuntu16.yml
+  when: (ansible_os_family == 'Debian' or ansible_os_family == 'Ubuntu') and ansible_distribution_release == 'xenial'
+  tags: package
+
+- include: setup-ubuntu18.yml
+  when: (ansible_os_family == 'Debian' or ansible_os_family == 'Ubuntu') and ansible_distribution_release == 'bionic'
+  tags: package
+
+- include: install-emane-tutorials.yml
+  when: emane_install_tutorial
